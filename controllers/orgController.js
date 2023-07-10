@@ -1,5 +1,4 @@
 const { Org } = require("../models");
-const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
@@ -18,12 +17,7 @@ exports.orgSignUp = async (req, res) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    org = await Org.create({
-      id: uuidv4(),
-      orgname,
-      email,
-      password: hashPassword,
-    });
+    org = await Org.createOrg(orgname, email, hashPassword);
 
     // Creating a payload for jwt
     const data = {
@@ -40,7 +34,11 @@ exports.orgSignUp = async (req, res) => {
       .status(201)
       .json({ message: "Successfully registered.", success: true, authToken });
   } catch (error) {
-    console.log(error);
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
   }
 };
 
@@ -67,12 +65,15 @@ exports.orgLogin = async (req, res) => {
     };
 
     const authToken = jwt.sign(data, JWT_SECRET);
-    
+
     res
       .status(200)
       .json({ message: "Successfully logged in.", success: true, authToken });
   } catch (error) {
-    console.log(error);
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
   }
-  res.json({ message: "Successfully logged in.", email, password });
 };

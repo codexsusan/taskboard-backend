@@ -1,0 +1,29 @@
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET;
+const { User, Org } = require("../models");
+
+exports.fetchUser = async (req, res, next) => {
+  const token = req.header("Authorization");
+  if (!token)
+    return res.status(401).json({ message: "No token found", success: false });
+  
+  try {
+    const data = jwt.verify(token, JWT_SECRET);
+    if (data.user) {
+      const user = await User.findOne({ where: { id: data.user.id } });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      req.orgId = user.orgId;
+      req.user = data.user;
+    }
+    if (data.org) {
+      const org = await Org.findOne({ where: { id: data.org.id } });
+      if (!org)
+        return res.status(404).json({ message: "Organization not found" });
+      req.orgId = org.id;
+      req.user = data.org;
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
