@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       Org.hasMany(models.User, {
         foreignKey: "orgId",
       });
+      Org.hasMany(models.Board, {
+        foreignKey: "orgId",
+      });
     }
     static createOrg = async (orgname, email, password) => {
       return this.create({

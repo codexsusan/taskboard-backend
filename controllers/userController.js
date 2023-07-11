@@ -28,9 +28,11 @@ exports.userLogIn = async (req, res) => {
     };
 
     const authToken = jwt.sign(data, JWT_SECRET);
-    res.json({ message: "Successfully logged in.", success: true, authToken });
+    res
+      .status(200)
+      .json({ message: "Successfully logged in.", success: true, authToken });
   } catch (error) {
-    res.json({
+    res.status(500).json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -60,17 +62,13 @@ exports.userSignUp = async (req, res) => {
       password: hashPassword,
       orgId,
     });
-    const data = {
-      user: {
-        id: user.id,
-      },
-      userType: "user",
-    };
-    const authToken = jwt.sign(data, JWT_SECRET);
-    res.json({ message: "Successfully registered.", success: true, authToken });
+
+    res
+      .status(201)
+      .json({ message: "Successfully registered.", success: true });
   } catch (error) {
     console.log(error);
-    res.json({
+    res.status(500).json({
       message: "Something went wrong.",
       success: false,
       error: error.message,

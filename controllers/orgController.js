@@ -34,7 +34,7 @@ exports.orgSignUp = async (req, res) => {
       .status(201)
       .json({ message: "Successfully registered.", success: true, authToken });
   } catch (error) {
-    res.json({
+    res.status(500).json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -70,7 +70,82 @@ exports.orgLogin = async (req, res) => {
       .status(200)
       .json({ message: "Successfully logged in.", success: true, authToken });
   } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.orgDelete = async (req, res) => {
+  const orgId = req.orgId;
+  try {
+    const org = await Org.findByPk(orgId);
+    if (!org)
+      return res
+        .status(400)
+        .json({ message: "Organization does not exist.", success: false });
+
+    await Org.destroy({ where: { id: orgId } });
+    res.status(200).json({ message: "Successfully deleted.", success: true });
+  } catch (error) {
     res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.orgUpdateBasic = async (req, res) => {
+  const orgId = req.orgId;
+  const { orgname, email } = req.body;
+  try {
+    const org = await Org.findByPk(orgId);
+    if (!org)
+      return res
+        .status(400)
+        .json({ message: "Organization does not exist.", success: false });
+    await Org.update({ orgname, email }, { where: { id: orgId } });
+    res.status(200).json({ message: "Successfully updated.", success: true });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.updateCredentials = async (req, res) => {
+  const orgId = req.orgId;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const org = await Org.findByPk(orgId);
+
+    if (!org)
+      return res
+        .status(400)
+        .json({ message: "Organization does not exist.", success: false });
+
+    const isMatch = await bcrypt.compare(oldPassword, org.password);
+
+    if (!isMatch)
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials.", success: false });
+
+    const salt = await bcrypt.genSalt(saltRounds);
+
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    await Org.update({ password: hashPassword }, { where: { id: orgId } });
+
+    res.status(200).json({ message: "Successfully updated.", success: true });
+    
+  } catch (error) {
+    res.status(500).json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
