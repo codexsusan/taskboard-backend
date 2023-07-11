@@ -7,9 +7,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Org.hasMany(models.User, {
         foreignKey: "orgId",
+        onDelete: "CASCADE",
+        // hooks: true,
       });
       Org.hasMany(models.Board, {
         foreignKey: "orgId",
+        onDelete: "CASCADE",
+        // hooks: true,
       });
     }
     static createOrg = async (orgname, email, password) => {

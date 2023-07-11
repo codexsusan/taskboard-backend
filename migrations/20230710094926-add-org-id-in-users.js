@@ -20,6 +20,7 @@ module.exports = {
         table: "Orgs",
         field: "id",
       },
+      onDelete: "cascade",
     });
   },
 
@@ -30,7 +31,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeConstraint("Users", "orgId");
+    // await queryInterface.removeConstraint("Users", "orgId");
     await queryInterface.removeColumn("Users", "orgId");
   },
 };

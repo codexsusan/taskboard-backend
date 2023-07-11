@@ -4,6 +4,7 @@ const { Board, User } = require("../models");
 exports.createBoard = async (req, res) => {
   const orgId = req.orgId;
   const { title, description } = req.body;
+  const userType = req.user.userType;
   try {
     const board = await Board.create({
       id: uuidv4(),
@@ -11,8 +12,24 @@ exports.createBoard = async (req, res) => {
       description,
       orgId,
       stageOrder: [],
-      assignedMembers: req.user.userType === "org" ? [] : [req.user.user.id],
+      assignedMembers: userType === "org" ? [] : [req.user.user.id],
     });
+
+    if (userType === "user") {
+      const user = await User.findByPk(req.user.user.id);
+      if (!user)
+        return res
+          .status(404)
+          .json({ message: "User not found", success: false });
+      await User.update(
+        {
+          associatedBoards: user.associatedBoards
+            ? [...user.associatedBoards, board.id]
+            : [board.id],
+        },
+        { where: { id: req.user.user.id } }
+      );
+    }
 
     res
       .status(201)
@@ -37,10 +54,7 @@ exports.updateBoard = async (req, res) => {
         .status(404)
         .json({ message: "Board not found", success: false });
 
-    await Board.update(
-      { title, description },
-      { where: { id: boardId } }
-    );
+    await Board.update({ title, description }, { where: { id: boardId } });
 
     res.status(200).json({
       message: "Board updated successfully",
@@ -116,7 +130,7 @@ exports.getBoard = async (req, res) => {
 
 exports.getAllBoards = async (req, res) => {
   const orgId = req.orgId;
-  console.log("Logging from line 119")
+  console.log("Logging from line 119");
   try {
     const allBoard = await Board.findAll(
       { attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -151,6 +165,7 @@ exports.addMember = async (req, res) => {
   try {
     const board = await Board.findOne({ where: { id: boardId, orgId } });
     const user = await User.findOne({ where: { email, orgId } });
+
     if (!board)
       return res
         .status(404)
@@ -166,6 +181,16 @@ exports.addMember = async (req, res) => {
         success: false,
       });
     }
+    await User.update(
+      {
+        associatedBoards: user.associatedBoards
+          ? [...user.associatedBoards, board.id]
+          : [board.id],
+      },
+      {
+        where: { id: user.id },
+      }
+    );
     let updatedBoard;
     if (board.assignedMembers.length === 0) {
       updatedBoard = await Board.update(
@@ -216,6 +241,17 @@ exports.removeMember = async (req, res) => {
         success: false,
       });
     }
+    const user = await User.findOne({ where: { id: userId, orgId } });
+    await User.update(
+      {
+        associatedBoards: user.associatedBoards.filter(
+          (board) => board !== boardId
+        ),
+      },
+      {
+        where: { id: user.id },
+      }
+    );
     const updatedBoard = await Board.update(
       {
         assignedMembers: board.assignedMembers.filter(

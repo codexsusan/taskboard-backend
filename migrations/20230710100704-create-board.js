@@ -6,7 +6,7 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       title: {
         type: Sequelize.STRING,
@@ -39,6 +39,7 @@ module.exports = {
         table: "Orgs",
         field: "id",
       },
+      onDelete: "cascade",
     });
   },
   async down(queryInterface, Sequelize) {

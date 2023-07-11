@@ -1,10 +1,9 @@
 const { Board } = require("../models");
-exports.checkMembership = async (req, res, next) => {
+exports.boardMembership = async (req, res, next) => {
   const { boardId } = req.params;
   const orgId = req.orgId;
   try {
     const board = await Board.findOne({ where: { id: boardId, orgId } });
-    console.log(board);
     if (!board)
       return res
         .status(404)

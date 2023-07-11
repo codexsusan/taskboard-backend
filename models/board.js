@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Board.belongsTo(models.Org, {
         foreignKey: "orgId",
+        onDelete: "CASCADE",
       })
     }
   }

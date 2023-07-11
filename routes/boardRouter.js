@@ -2,26 +2,26 @@ const express = require("express");
 const router = express.Router();
 const boardController = require("../controllers/boardController");
 const { verifyUser } = require("../middlewares/verifyUser");
-const { checkMembership } = require("../middlewares/checkMembership");
+const { boardMembership } = require("../middlewares/boardMembership");
 const { onlyOrgAccess } = require("../middlewares/onlyOrgAccess");
 
 router.post("/create", verifyUser, boardController.createBoard);
 router.get(
   "/view/:boardId",
   verifyUser,
-  checkMembership,
+  boardMembership,
   boardController.getBoard
 );
 router.patch(
   "/:boardId",
   verifyUser,
-  checkMembership,
+  boardMembership,
   boardController.updateBoard
 );
 router.delete(
   "/:boardId",
   verifyUser,
-  checkMembership,
+  boardMembership,
   boardController.deleteBoard
 );
 

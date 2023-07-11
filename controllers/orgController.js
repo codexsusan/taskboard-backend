@@ -1,4 +1,4 @@
-const { Org } = require("../models");
+const { Org, User, Board } = require("../models");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
@@ -86,7 +86,6 @@ exports.orgDelete = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Organization does not exist.", success: false });
-
     await Org.destroy({ where: { id: orgId } });
     res.status(200).json({ message: "Successfully deleted.", success: true });
   } catch (error) {
@@ -143,9 +142,36 @@ exports.updateCredentials = async (req, res) => {
     await Org.update({ password: hashPassword }, { where: { id: orgId } });
 
     res.status(200).json({ message: "Successfully updated.", success: true });
-    
   } catch (error) {
     res.status(500).json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.getOrg = async (req, res) => {
+  const orgId = req.params.orgId;
+  const requestOrgId = req.orgId;
+  if (orgId !== requestOrgId)
+    return res.status(400).json({ message: "Unauthorized.", success: false });
+  try {
+    const org = await Org.findByPk(orgId, {
+      attributes: {
+        exclude: ["password", "createdAt", "updatedAt"],
+      },
+    });
+
+    if (!org)
+      return res
+        .status(400)
+        .json({ message: "Organization does not exist.", success: false });
+    res
+      .status(200)
+      .json({ message: "Successfully fetched.", success: true, org });
+  } catch (error) {
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
