@@ -164,7 +164,7 @@ exports.getUser = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Successfully fetched.", success: true, user });
+      .json({ message: "Successfully fetched.", success: true, data: user });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -196,7 +196,7 @@ exports.getAllUsersInBoard = async (req, res) => {
     }
     res
       .status(200)
-      .json({ message: "Successfully fetched.", success: true, users });
+      .json({ message: "Successfully fetched.", success: true, data: users });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -218,7 +218,7 @@ exports.getAllUsers = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Successfully fetched.", success: true, users });
+      .json({ message: "Successfully fetched.", success: true, data: users });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",

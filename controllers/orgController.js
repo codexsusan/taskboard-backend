@@ -169,7 +169,7 @@ exports.getOrg = async (req, res) => {
         .json({ message: "Organization does not exist.", success: false });
     res
       .status(200)
-      .json({ message: "Successfully fetched.", success: true, org });
+      .json({ message: "Successfully fetched.", success: true, data: org });
   } catch (error) {
     res.json({
       message: "Something went wrong.",

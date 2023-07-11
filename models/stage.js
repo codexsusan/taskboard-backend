@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Board extends Model {
+  class Stage extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,28 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Board.belongsTo(models.Org, {
-        foreignKey: "orgId",
-        onDelete: "CASCADE",
-      });
-      Board.hasMany(models.Stage, {
+      Stage.belongsTo(models.Board, {
         foreignKey: "boardId",
         onDelete: "CASCADE",
       });
     }
   }
-  Board.init(
+  Stage.init(
     {
       title: DataTypes.STRING,
-      description: DataTypes.STRING,
-      orgId: DataTypes.STRING,
-      stageOrder: DataTypes.ARRAY(DataTypes.STRING),
-      assignedMembers: DataTypes.ARRAY(DataTypes.STRING),
+      boardId: DataTypes.STRING,
     },
     {
       sequelize,
-      modelName: "Board",
+      modelName: "Stage",
     }
   );
-  return Board;
+  return Stage;
 };

@@ -33,7 +33,11 @@ exports.createBoard = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Board created successfully.", success: true, board });
+      .json({
+        message: "Board created successfully.",
+        success: true,
+        data: board,
+      });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong",
@@ -118,7 +122,11 @@ exports.getBoard = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Board listed successfully", success: true, board });
+      .json({
+        message: "Board listed successfully",
+        success: true,
+        data: board,
+      });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong",
@@ -144,7 +152,7 @@ exports.getAllBoards = async (req, res) => {
     res.status(200).json({
       message: "Boards listed successfully",
       success: true,
-      boards: allBoard,
+      data: allBoard,
     });
   } catch (error) {
     res.status(500).json({
