@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       associatedBoards: DataTypes.ARRAY(DataTypes.STRING),
+      assignedTasks: DataTypes.ARRAY(DataTypes.STRING),
     },
     {
       sequelize,
