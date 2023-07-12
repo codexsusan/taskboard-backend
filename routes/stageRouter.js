@@ -26,4 +26,19 @@ router.patch(
     stageController.updateStage
 )
 
+
+router.get(
+  "/board/:boardId/view/:stageId",
+  verifyUser,
+  boardMembership,
+  stageController.viewStage
+)
+
+router.get(
+  "/board/:boardId/stages/all",
+  verifyUser,
+  boardMembership,
+  stageController.viewAllStages
+)
+
 module.exports = router;

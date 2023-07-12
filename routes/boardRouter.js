@@ -13,7 +13,7 @@ router.get(
   boardController.getBoard
 );
 router.patch(
-  "/:boardId",
+  "/update/:boardId",
   verifyUser,
   boardMembership,
   boardController.updateBoard

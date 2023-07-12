@@ -31,13 +31,11 @@ exports.createBoard = async (req, res) => {
       );
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Board created successfully.",
-        success: true,
-        data: board,
-      });
+    res.status(201).json({
+      message: "Board created successfully.",
+      success: true,
+      data: board,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong",
@@ -52,12 +50,6 @@ exports.updateBoard = async (req, res) => {
   const { title, description } = req.body;
   const orgId = req.orgId;
   try {
-    const board = await Board.findOne({ where: { id: boardId, orgId } });
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
-
     await Board.update({ title, description }, { where: { id: boardId } });
 
     res.status(200).json({
@@ -78,13 +70,7 @@ exports.deleteBoard = async (req, res) => {
   const boardId = req.params.boardId;
   const orgId = req.orgId;
   try {
-    const board = await Board.findOne({ where: { id: boardId, orgId } });
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
-
-    const deletedBoard = await Board.destroy({ where: { id: boardId } });
+    await Board.destroy({ where: { id: boardId } });
     res.status(200).json({
       message: "Board deleted successfully",
       success: true,
@@ -103,30 +89,11 @@ exports.getBoard = async (req, res) => {
   const boardId = req.params.boardId;
   const orgId = req.orgId;
   try {
-    const board = await Board.findOne(
-      {
-        attributes: [
-          "id",
-          "title",
-          "description",
-          "stageOrder",
-          "assignedMembers",
-        ],
-      },
-      { where: { id: boardId, orgId } }
-    );
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
-
-    res
-      .status(200)
-      .json({
-        message: "Board listed successfully",
-        success: true,
-        data: board,
-      });
+    res.status(200).json({
+      message: "Board listed successfully",
+      success: true,
+      data: req.board,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong",

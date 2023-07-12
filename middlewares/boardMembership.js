@@ -8,9 +8,13 @@ exports.boardMembership = async (req, res, next) => {
       return res
         .status(404)
         .json({ message: "Board not found", success: false });
-    if (req.user.userType === "org") return next();
+    if (req.user.userType === "org") {
+      req.board = board;
+      return next();
+    }
     const userId = req.user.user.id;
     if (board.assignedMembers.includes(userId)) {
+      req.board = board;
       next();
     } else {
       return res.status(401).json({ message: "Unauthorized", success: false });

@@ -11,11 +11,13 @@ const orgRouter = require("./routes/orgRouter");
 const userRouter = require("./routes/userRouter");
 const boardRouter = require("./routes/boardRouter");
 const stageRouter = require("./routes/stageRouter");
+const taskRouter = require("./routes/taskRouter");
 
 // Routes
 app.use("/org", orgRouter);
 app.use("/user", userRouter);
 app.use("/board", boardRouter);
 app.use("/stage", stageRouter);
+app.use("/task", taskRouter);
 
 module.exports = app;
