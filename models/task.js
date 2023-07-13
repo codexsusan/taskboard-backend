@@ -9,9 +9,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      
+
       Task.belongsTo(models.Stage, {
         foreignKey: "stageId",
+        onDelete: "CASCADE",
+      });
+      Task.hasMany(models.Comment, {
+        foreignKey: "taskId",
         onDelete: "CASCADE",
       });
     }

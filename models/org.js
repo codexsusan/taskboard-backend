@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         // hooks: true,
       });
+      Org.hasMany(models.Comment, {
+        foreignKey: "orgId",
+        onDelete: "CASCADE",
+      });
+      
     }
     static createOrg = async (orgname, email, password) => {
       return this.create({
