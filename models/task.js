@@ -26,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.STRING,
       priority: DataTypes.STRING,
       commentsOrder: DataTypes.ARRAY(DataTypes.STRING),
-      assignedTo: DataTypes.ARRAY(DataTypes.STRING),
       stageId: DataTypes.STRING,
     },
     {

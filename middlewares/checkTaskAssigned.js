@@ -1,4 +1,4 @@
-const { Task } = require("../models");
+const { Task, UserTask } = require("../models");
 exports.checkTaskAssigned = async (req, res, next) => {
   const { taskId } = req.params;
   const userType = req.user.userType;
@@ -16,10 +16,16 @@ exports.checkTaskAssigned = async (req, res, next) => {
     }
     if (userType === "user") {
       const userId = req.user.user.id;
-      if (task.assignedTo.includes(userId)) {
-        req.task = task;
-        return next();
-      }
+      const userTask = await UserTask.findOne({
+        where: { userId, taskId },
+      });
+      if (!userTask)
+        return res.status(404).json({
+          message: "User hasn't been assigned this task.",
+          success: false,
+        });
+      req.task = task;
+      return next();
     }
   } catch (error) {
     res.status(500).json({

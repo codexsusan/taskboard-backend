@@ -2,23 +2,17 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Boards", {
+    await queryInterface.createTable("BoardMembers", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.STRING,
       },
-      title: {
+      boardId: {
         type: Sequelize.STRING,
       },
-      description: {
+      userId: {
         type: Sequelize.STRING,
-      },
-      orgId: {
-        type: Sequelize.STRING,
-      },
-      stageOrder: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       createdAt: {
         allowNull: false,
@@ -29,18 +23,28 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
-    await queryInterface.addConstraint("Boards", {
-      fields: ["orgId"],
+
+    await queryInterface.addConstraint("BoardMembers", {
+      fields: ["boardId"],
       type: "foreign key",
       references: {
-        table: "Orgs",
+        table: "Boards",
+        field: "id",
+      },
+      onDelete: "cascade",
+    });
+
+    await queryInterface.addConstraint("BoardMembers", {
+      fields: ["userId"],
+      type: "foreign key",
+      references: {
+        table: "Users",
         field: "id",
       },
       onDelete: "cascade",
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Boards");
+    await queryInterface.dropTable("BoardMembers");
   },
 };
-

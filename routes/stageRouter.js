@@ -26,7 +26,6 @@ router.patch(
     stageController.updateStage
 )
 
-
 router.get(
   "/board/:boardId/view/:stageId",
   verifyUser,

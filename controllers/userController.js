@@ -1,4 +1,4 @@
-const { User, Board } = require("../models");
+const { User, Board, BoardMembers } = require("../models");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -8,7 +8,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 exports.userLogIn = async (req, res) => {
   const { email, password } = req.body;
   try {
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findOne({
+      where: { email },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    });
     if (!user)
       return res
         .status(400)
@@ -28,9 +31,17 @@ exports.userLogIn = async (req, res) => {
     };
 
     const authToken = jwt.sign(data, JWT_SECRET);
-    res
-      .status(200)
-      .json({ message: "Successfully logged in.", success: true, authToken });
+    res.status(200).json({
+      message: "Successfully logged in.",
+      success: true,
+      authToken,
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        orgId: user.orgId,
+      },
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -44,7 +55,10 @@ exports.userSignUp = async (req, res) => {
   const { username, email, password } = req.body;
   const orgId = req.orgId;
   try {
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findOne(
+      { where: { email } },
+      { attributes: { exclude: ["createdAt", "updatedAt"] } }
+    );
     if (user)
       return res
         .status(400)
@@ -60,12 +74,18 @@ exports.userSignUp = async (req, res) => {
       email,
       password: hashPassword,
       orgId,
-      associatedBoards: [],
     });
 
-    res
-      .status(201)
-      .json({ message: "Successfully registered.", success: true });
+    res.status(201).json({
+      message: "Successfully registered.",
+      success: true,
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        orgId: user.orgId,
+      },
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -184,7 +204,11 @@ exports.getAllUsersInBoard = async (req, res) => {
         .status(400)
         .json({ message: "Board does not exist.", success: false });
 
-    const members = [...board.assignedMembers];
+    const boardMembers = await BoardMembers.findAll({
+      where: { boardId },
+      attributes: ["userId"],
+    });
+    const members = boardMembers.map((member) => member.userId);
     let users = [];
     for (let i = 0; i < members.length; i++) {
       let user = await User.findByPk(members[i], {
@@ -208,17 +232,34 @@ exports.getAllUsersInBoard = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   const orgId = req.orgId;
+  const { page, limit } = req.query;
+  const startIndex = parseInt((page - 1) * limit);
+  const endIndex = parseInt(page * limit);
   try {
-    let users = await User.findAll({
+    let results = {};
+    const allData = await User.findAll({
       where: { orgId },
-      attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
-      },
     });
-
-    res
-      .status(200)
-      .json({ message: "Successfully fetched.", success: true, data: users });
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+    if (endIndex < allData.length) {
+      results.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+    results.results = allData.slice(startIndex, endIndex);
+    const responseData = results;
+    res.status(200).json({
+      message: "Successfully fetched.",
+      success: true,
+      data: responseData,
+      dataLength: allData.length,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -257,14 +298,14 @@ exports.deleteUser = async (req, res) => {
           .json({ message: "Unauthorized.", success: false });
     }
 
-    const boardsId = [...user.associatedBoards];
-    for (let i = 0; i < boardsId.length; i++) {
-      const board = await Board.findByPk(boardsId[i]);
-      let assignedMembers = board.assignedMembers.filter(
-        (memberId) => memberId !== user.id
-      );
-      await Board.update({ assignedMembers }, { where: { id: board.id } });
-    }
+    // const boardsId = [...user.associatedBoards];
+    // for (let i = 0; i < boardsId.length; i++) {
+    //   const board = await Board.findByPk(boardsId[i]);
+    //   let assignedMembers = board.assignedMembers.filter(
+    //     (memberId) => memberId !== user.id
+    //   );
+    //   await Board.update({ assignedMembers }, { where: { id: board.id } });
+    // }
     await User.destroy({ where: { id: userId } });
 
     res.status(200).json({ message: "Successfully deleted.", success: true });

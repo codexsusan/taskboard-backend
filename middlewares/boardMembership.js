@@ -1,4 +1,4 @@
-const { Board } = require("../models");
+const { Board, BoardMember } = require("../models");
 exports.boardMembership = async (req, res, next) => {
   const { boardId } = req.params;
   const orgId = req.orgId;
@@ -13,9 +13,12 @@ exports.boardMembership = async (req, res, next) => {
       return next();
     }
     const userId = req.user.user.id;
-    if (board.assignedMembers.includes(userId)) {
+    const boardMember = await BoardMember.findOne({
+      where: { userId, boardId },
+    });
+    if (boardMember) {
       req.board = board;
-      next();
+      return next();
     } else {
       return res.status(401).json({ message: "Unauthorized", success: false });
     }

@@ -2,23 +2,18 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Boards", {
+    await queryInterface.createTable("UserTasks", {
       id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      taskId: {
         type: Sequelize.STRING,
       },
-      title: {
+      userId: {
         type: Sequelize.STRING,
-      },
-      description: {
-        type: Sequelize.STRING,
-      },
-      orgId: {
-        type: Sequelize.STRING,
-      },
-      stageOrder: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       createdAt: {
         allowNull: false,
@@ -29,18 +24,26 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
-    await queryInterface.addConstraint("Boards", {
-      fields: ["orgId"],
+    await queryInterface.addConstraint("UserTasks", {
+      fields: ["taskId"],
       type: "foreign key",
       references: {
-        table: "Orgs",
+        table: "Tasks",
+        field: "id",
+      },
+      onDelete: "cascade",
+    });
+    await queryInterface.addConstraint("UserTasks", {
+      fields: ["userId"],
+      type: "foreign key",
+      references: {
+        table: "Users",
         field: "id",
       },
       onDelete: "cascade",
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Boards");
+    await queryInterface.dropTable("UserTasks");
   },
 };
-

@@ -7,6 +7,7 @@ const { boardMembership } = require("../middlewares/boardMembership");
 const { onlyOrgAccess } = require("../middlewares/onlyOrgAccess");
 const { checkTaskAssigned } = require("../middlewares/checkTaskAssigned");
 
+// Create a task
 router.post(
   "/board/:boardId/stage/:stageId/create",
   verifyUser,
@@ -14,6 +15,7 @@ router.post(
   taskController.createTask
 );
 
+// Delete a task
 router.delete(
   "/board/:boardId/stage/:stageId/delete/:taskId",
   verifyUser,
@@ -21,6 +23,7 @@ router.delete(
   taskController.deleteTask
 );
 
+// Update a task
 router.patch(
   "/board/:boardId/stage/:stageId/update/:taskId",
   verifyUser,
@@ -28,6 +31,7 @@ router.patch(
   taskController.updateTask
 );
 
+// Get a task
 router.get(
   "/board/:boardId/stage/:stageId/view/:taskId",
   verifyUser,
@@ -35,6 +39,7 @@ router.get(
   taskController.viewTask
 );
 
+// Get all tasks in a stage
 router.get(
   "/board/:boardId/stage/:stageId/all",
   verifyUser,
@@ -42,6 +47,7 @@ router.get(
   taskController.viewAllTasks
 );
 
+// Assign a task to user
 router.patch(
   "/board/:boardId/:taskId/assign/:userId",
   verifyUser,
@@ -49,11 +55,16 @@ router.patch(
   taskController.assignTask
 );
 
+// Unassign a task from user
 router.patch(
   "/board/:boardId/:taskId/unassign/:userId",
   verifyUser,
   onlyOrgAccess,
   taskController.unassignTask
 );
+
+// Get all task of an organization
+router.get("/org/allTasks", verifyUser, taskController.viewAllTasksInOrg);
+
 
 module.exports = router;

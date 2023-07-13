@@ -30,9 +30,16 @@ exports.orgSignUp = async (req, res) => {
     // Signing the jwt token
     const authToken = jwt.sign(data, JWT_SECRET);
 
-    res
-      .status(201)
-      .json({ message: "Successfully registered.", success: true, authToken });
+    res.status(201).json({
+      message: "Successfully registered.",
+      success: true,
+      authToken,
+      data: {
+        id: org.id,
+        orgname: org.orgname,
+        email: org.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",
@@ -66,9 +73,16 @@ exports.orgLogin = async (req, res) => {
 
     const authToken = jwt.sign(data, JWT_SECRET);
 
-    res
-      .status(200)
-      .json({ message: "Successfully logged in.", success: true, authToken });
+    res.status(200).json({
+      message: "Successfully logged in.",
+      success: true,
+      authToken,
+      data: {
+        id: org.id,
+        orgname: org.orgname,
+        email: org.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({
       message: "Something went wrong.",

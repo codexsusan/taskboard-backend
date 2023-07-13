@@ -5,6 +5,7 @@ const { verifyUser } = require("../middlewares/verifyUser");
 const { onlyUserAccess } = require("../middlewares/onlyUserAccess");
 const { onlyOrgAccess } = require("../middlewares/onlyOrgAccess");
 const { boardMembership } = require("../middlewares/boardMembership");
+const { User } = require("../models");
 
 router.post("/register", verifyUser, userController.userSignUp);
 
@@ -26,7 +27,12 @@ router.patch(
 
 router.get("/view/:userId", verifyUser, userController.getUser);
 
-router.get("/org/all", verifyUser, onlyOrgAccess, userController.getAllUsers);
+router.get(
+  "/org/all",
+  verifyUser,
+  onlyOrgAccess,
+  userController.getAllUsers
+);
 
 router.get(
   "/all/board/:boardId",

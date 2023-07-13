@@ -3,7 +3,7 @@ const { Stage, Board } = require("../models");
 
 exports.createStage = async (req, res) => {
   const boardId = req.params.boardId;
-  const title = req.body.title;
+  const title = req.body.title;tas
   try {
     const board = await Board.findByPk(boardId);
     if (!board)

@@ -20,9 +20,6 @@ module.exports = {
       commentsOrder: {
         type: Sequelize.ARRAY(Sequelize.STRING),
       },
-      assignedTo: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-      },
       stageId: {
         type: Sequelize.STRING,
       },

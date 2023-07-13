@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.STRING,
       orgId: DataTypes.STRING,
       stageOrder: DataTypes.ARRAY(DataTypes.STRING),
-      assignedMembers: DataTypes.ARRAY(DataTypes.STRING),
     },
     {
       sequelize,
