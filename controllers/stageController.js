@@ -1,13 +1,13 @@
 const { v4: uuidv4 } = require("uuid");
-const { Stage, Board } = require("../models");
+const { Stage, Board, Task } = require("../models");
 
 exports.createStage = async (req, res) => {
   const boardId = req.params.boardId;
-  const title = req.body.title;tas
+  const title = req.body.title;
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
@@ -27,7 +27,7 @@ exports.createStage = async (req, res) => {
       data: stage,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       message: error.message,
@@ -41,14 +41,14 @@ exports.updateStage = async (req, res) => {
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
 
     const stage = await Stage.findOne({ where: { id: stageId, boardId } });
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -60,7 +60,7 @@ exports.updateStage = async (req, res) => {
       data: { id: stageId, title },
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       message: error.message,
@@ -73,7 +73,7 @@ exports.viewStage = async (req, res) => {
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
@@ -83,7 +83,7 @@ exports.viewStage = async (req, res) => {
       { where: { id: stageId, boardId } }
     );
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -94,7 +94,7 @@ exports.viewStage = async (req, res) => {
       data: stage,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       message: error.message,
@@ -105,24 +105,30 @@ exports.viewStage = async (req, res) => {
 exports.viewAllStages = async (req, res) => {
   const { boardId } = req.params;
   try {
-    const board = await Board.findByPk(boardId);
-    if (!board)
-      return res.status(404).json({
-        message: "Board not found.",
-        success: false,
-      });
+    const allStage = await Stage.findAll({ where: { boardId } });
+    let tasks = [];
+    for (let i = 0; i < allStage.length; i++) {
+      const task = await Task.findAll({ where: { stageId: allStage[i].id } });
+      tasks = [...tasks, ...task];
+    }
 
-    const stages = await Stage.findAll(
-      { attributes: { exclude: ["createdAt", "updatedAt"] } },
-      { where: { boardId } }
-    );
+    const stageData = allStage.map((stage) => {
+      const task = tasks.filter((task) => task.stageId === stage.id);
+      return {
+        id: stage.id,
+        title: stage.title,
+        description: stage.description,
+        boardId: stage.boardId,
+        tasks: task,
+      };
+    });
     res.status(200).json({
       message: "Stages found.",
       success: true,
-      data: stages,
+      data: stageData,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       message: error.message,
@@ -135,14 +141,14 @@ exports.deleteStage = async (req, res) => {
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
 
     const stage = await Stage.findOne({ where: { id: stageId, boardId } });
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -158,7 +164,7 @@ exports.deleteStage = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       message: error.message,

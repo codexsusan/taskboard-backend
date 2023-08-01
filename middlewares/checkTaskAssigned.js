@@ -5,7 +5,7 @@ exports.checkTaskAssigned = async (req, res, next) => {
   try {
     const task = await Task.findByPk(taskId);
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
@@ -20,7 +20,7 @@ exports.checkTaskAssigned = async (req, res, next) => {
         where: { userId, taskId },
       });
       if (!userTask)
-        return res.status(404).json({
+        return res.json({
           message: "User hasn't been assigned this task.",
           success: false,
         });
@@ -28,7 +28,7 @@ exports.checkTaskAssigned = async (req, res, next) => {
       return next();
     }
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,

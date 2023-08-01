@@ -4,10 +4,7 @@ exports.boardMembership = async (req, res, next) => {
   const orgId = req.orgId;
   try {
     const board = await Board.findOne({ where: { id: boardId, orgId } });
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
+    if (!board) return res.json({ message: "Board not found", success: false });
     if (req.user.userType === "org") {
       req.board = board;
       return next();
@@ -20,11 +17,11 @@ exports.boardMembership = async (req, res, next) => {
       req.board = board;
       return next();
     } else {
-      return res.status(401).json({ message: "Unauthorized", success: false });
+      return res.json({ message: "Unauthorized", success: false });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,

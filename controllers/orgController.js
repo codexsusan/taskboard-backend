@@ -10,7 +10,6 @@ exports.orgSignUp = async (req, res) => {
     let org = await Org.findOne({ where: { email } });
     if (org)
       return res
-        .status(400)
         .json({ message: "Organization already exists", success: false });
 
     // Hashing the password
@@ -41,7 +40,7 @@ exports.orgSignUp = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -55,13 +54,11 @@ exports.orgLogin = async (req, res) => {
     let org = await Org.findOne({ where: { email } });
     if (!org)
       return res
-        .status(400)
         .json({ message: "Invalid credentials.", success: false });
 
     const isMatch = await bcrypt.compare(password, org.password);
     if (!isMatch)
       return res
-        .status(400)
         .json({ message: "Invalid credentials.", success: false });
 
     const data = {
@@ -84,7 +81,7 @@ exports.orgLogin = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -98,7 +95,6 @@ exports.orgDelete = async (req, res) => {
     const org = await Org.findByPk(orgId);
     if (!org)
       return res
-        .status(400)
         .json({ message: "Organization does not exist.", success: false });
     await Org.destroy({ where: { id: orgId } });
     res.status(200).json({ message: "Successfully deleted.", success: true });
@@ -118,12 +114,11 @@ exports.orgUpdateBasic = async (req, res) => {
     const org = await Org.findByPk(orgId);
     if (!org)
       return res
-        .status(400)
         .json({ message: "Organization does not exist.", success: false });
     await Org.update({ orgname, email }, { where: { id: orgId } });
     res.status(200).json({ message: "Successfully updated.", success: true });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -139,14 +134,12 @@ exports.updateCredentials = async (req, res) => {
 
     if (!org)
       return res
-        .status(400)
         .json({ message: "Organization does not exist.", success: false });
 
     const isMatch = await bcrypt.compare(oldPassword, org.password);
 
     if (!isMatch)
       return res
-        .status(400)
         .json({ message: "Invalid credentials.", success: false });
 
     const salt = await bcrypt.genSalt(saltRounds);
@@ -157,7 +150,7 @@ exports.updateCredentials = async (req, res) => {
 
     res.status(200).json({ message: "Successfully updated.", success: true });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -169,7 +162,7 @@ exports.getOrg = async (req, res) => {
   const orgId = req.params.orgId;
   const requestOrgId = req.orgId;
   if (orgId !== requestOrgId)
-    return res.status(400).json({ message: "Unauthorized.", success: false });
+    return res.json({ message: "Unauthorized.", success: false });
   try {
     const org = await Org.findByPk(orgId, {
       attributes: {
@@ -179,7 +172,6 @@ exports.getOrg = async (req, res) => {
 
     if (!org)
       return res
-        .status(400)
         .json({ message: "Organization does not exist.", success: false });
     res
       .status(200)

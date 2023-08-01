@@ -48,7 +48,7 @@ router.get(
 );
 
 // Assign a task to user
-router.patch(
+router.get(
   "/board/:boardId/:taskId/assign/:userId",
   verifyUser,
   onlyOrgAccess,
@@ -56,15 +56,30 @@ router.patch(
 );
 
 // Unassign a task from user
-router.patch(
+router.get(
   "/board/:boardId/:taskId/unassign/:userId",
   verifyUser,
   onlyOrgAccess,
   taskController.unassignTask
 );
 
+// Get all assigned user of a task
+router.get(
+  "/board/:boardId/:taskId/allAssigned",
+  verifyUser,
+  boardMembership,
+  taskController.viewAllAssigned
+);
+
 // Get all task of an organization
 router.get("/org/allTasks", verifyUser, taskController.viewAllTasksInOrg);
 
+// Switch stage of a task
+router.get(
+  "/board/:boardId/:taskId/:srcStageId/:destStageId",
+  verifyUser,
+  boardMembership,
+  taskController.updateStage
+);
 
 module.exports = router;

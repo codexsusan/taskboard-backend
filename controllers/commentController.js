@@ -8,7 +8,7 @@ exports.createComment = async (req, res) => {
   try {
     const task = await Task.findByPk(taskId);
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
@@ -44,7 +44,7 @@ exports.createComment = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -57,7 +57,7 @@ exports.getComment = async (req, res) => {
   try {
     const comment = await Comment.findByPk(commentId);
     if (!comment)
-      return res.status(404).json({
+      return res.json({
         message: "Comment not found.",
         success: false,
       });
@@ -67,7 +67,7 @@ exports.getComment = async (req, res) => {
       data: comment,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -88,7 +88,7 @@ exports.getAllComments = async (req, res) => {
       data: comments,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -101,7 +101,7 @@ exports.deleteComment = async (req, res) => {
   try {
     const comment = await Comment.findByPk(commentId);
     if (!comment)
-      return res.status(404).json({
+      return res.json({
         message: "Comment not found.",
         success: false,
       });
@@ -111,7 +111,7 @@ exports.deleteComment = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,

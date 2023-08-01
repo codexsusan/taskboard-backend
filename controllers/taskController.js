@@ -15,7 +15,7 @@ exports.createTask = async (req, res) => {
   try {
     const stage = await Stage.findByPk(stageId);
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -40,7 +40,7 @@ exports.createTask = async (req, res) => {
       data: task,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -54,13 +54,13 @@ exports.updateTask = async (req, res) => {
   try {
     const stage = await Stage.findByPk(stageId);
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
     const task = await Task.findByPk(taskId);
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
@@ -79,7 +79,7 @@ exports.updateTask = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -92,7 +92,7 @@ exports.viewTask = async (req, res) => {
   try {
     const stage = await Stage.findByPk(stageId);
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -100,7 +100,7 @@ exports.viewTask = async (req, res) => {
       attributes: { exclude: ["updatedAt"] },
     });
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
@@ -110,7 +110,7 @@ exports.viewTask = async (req, res) => {
       data: task,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -123,7 +123,7 @@ exports.viewAllTasks = async (req, res) => {
   try {
     const stage = await Stage.findByPk(stageId);
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -137,7 +137,7 @@ exports.viewAllTasks = async (req, res) => {
       data: tasks,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -150,19 +150,19 @@ exports.assignTask = async (req, res) => {
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
     const task = await Task.findByPk(taskId);
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
     const user = await User.findByPk(userId);
     if (!user)
-      return res.status(404).json({
+      return res.json({
         message: "User not found.",
         success: false,
       });
@@ -170,7 +170,7 @@ exports.assignTask = async (req, res) => {
       where: { userId, boardId },
     });
     if (!isBoardMember)
-      return res.status(401).json({
+      return res.json({
         message: "User not board member.",
         success: false,
       });
@@ -178,12 +178,13 @@ exports.assignTask = async (req, res) => {
       where: { userId, taskId },
     });
     if (isAlreadyAssigned)
-      return res.status(409).json({
+      return res.json({
         message: "User already assigned.",
         success: false,
       });
 
     await UserTask.create({
+      // id: uuidv4(),
       userId,
       taskId,
     });
@@ -192,7 +193,7 @@ exports.assignTask = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -205,19 +206,19 @@ exports.unassignTask = async (req, res) => {
   try {
     const board = await Board.findByPk(boardId);
     if (!board)
-      return res.status(404).json({
+      return res.json({
         message: "Board not found.",
         success: false,
       });
     const task = await Task.findByPk(taskId);
     if (!task)
-      return res.status(404).json({
+      return res.json({
         message: "Task not found.",
         success: false,
       });
     const user = await User.findByPk(userId);
     if (!user)
-      return res.status(404).json({
+      return res.json({
         message: "User not found.",
         success: false,
       });
@@ -225,7 +226,7 @@ exports.unassignTask = async (req, res) => {
       where: { userId, boardId },
     });
     if (!isBoardMember)
-      return res.status(401).json({
+      return res.json({
         message: "User not board member.",
         success: false,
       });
@@ -233,7 +234,7 @@ exports.unassignTask = async (req, res) => {
       where: { userId, taskId },
     });
     if (!isAssigned)
-      return res.status(409).json({
+      return res.json({
         message: "User isn't assigned.",
         success: false,
       });
@@ -243,7 +244,50 @@ exports.unassignTask = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.viewAllAssigned = async (req, res) => {
+  const { taskId, boardId } = req.params;
+  try {
+    const board = await Board.findByPk(boardId);
+    if (!board)
+      return res.json({
+        message: "Board not found.",
+        success: false,
+      });
+    const task = await Task.findByPk(taskId);
+    if (!task)
+      return res.json({
+        message: "Task not found.",
+        success: false,
+      });
+    const assignedUsers = await UserTask.findAll({
+      where: { taskId },
+      attributes: { exclude: ["updatedAt"] },
+    });
+    let users = [];
+    for (let i = 0; i < assignedUsers.length; i++) {
+      const assignedUser = assignedUsers[i];
+      const user = await User.findOne(
+        { attributes: { exclude: ["password", "createdAt", "updatedAt"] } },
+        { where: { id: assignedUser.userId } }
+      );
+      users = [...users, user];
+    }
+    res.status(200).json({
+      message: "Assigned users found.",
+      success: true,
+      data: users,
+      assignedUsersCount: assignedUsers.length,
+    });
+  } catch (error) {
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -256,7 +300,7 @@ exports.deleteTask = async (req, res) => {
   try {
     const stage = await Stage.findByPk(stageId);
     if (!stage)
-      return res.status(404).json({
+      return res.json({
         message: "Stage not found.",
         success: false,
       });
@@ -266,7 +310,7 @@ exports.deleteTask = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,
@@ -298,10 +342,51 @@ exports.viewAllTasksInOrg = async (req, res) => {
       message: "Tasks found.",
       success: true,
       data: tasks,
-      dataLength: tasks.length,
+      tasksCount: tasks.length,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.updateStage = async (req, res) => {
+  const { taskId, srcStageId, destStageId } = req.params;
+  try {
+    const task = await Task.findByPk(taskId);
+    if (!task)
+      return res.json({
+        message: "Task not found.",
+        success: false,
+      });
+    const srcStage = await Stage.findByPk(srcStageId);
+    if (!srcStage)
+      return res.json({
+        message: "Source stage not found.",
+        success: false,
+      });
+    const destStage = await Stage.findByPk(destStageId);
+    if (!destStage)
+      return res.json({
+        message: "Destination stage not found.",
+        success: false,
+      });
+    const updatedTask = await Task.update(
+      {
+        stageId: destStageId,
+      },
+      { where: { id: taskId } }
+    );
+    res.status(200).json({
+      message: "Task updated successfully.",
+      success: true,
+      task: updatedTask,
+    });
+  } catch (error) {
+    res.json({
       message: "Something went wrong.",
       success: false,
       error: error.message,

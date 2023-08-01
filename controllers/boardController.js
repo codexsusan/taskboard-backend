@@ -18,7 +18,6 @@ exports.createBoard = async (req, res) => {
       const user = await User.findByPk(req.user.user.id);
       if (!user)
         return res
-          .status(404)
           .json({ message: "User not found", success: false });
 
       const boardMember = await BoardMember.findOne({
@@ -26,7 +25,7 @@ exports.createBoard = async (req, res) => {
       });
 
       if (boardMember)
-        return res.status(400).json({
+        return res.json({
           message: "User already added",
           success: false,
         });
@@ -44,7 +43,7 @@ exports.createBoard = async (req, res) => {
       data: board,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -68,7 +67,7 @@ exports.updateBoard = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -88,7 +87,7 @@ exports.deleteBoard = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -106,7 +105,7 @@ exports.getBoard = async (req, res) => {
       data: req.board,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -122,24 +121,22 @@ exports.getAllBoards = async (req, res) => {
       { where: { orgId } }
     );
     if (!allBoard)
-      return res
-        .status(404)
-        .json({ message: "Boards not found", success: false });
+      return res.json({ message: "Boards not found", success: false });
 
     if (allBoard.length === 0) {
-      return res.status(200).json({
+      return res.json({
         message: "No boards found",
         success: false,
       });
     }
 
-    res.status(200).json({
+    res.json({
       message: "Boards listed successfully",
       success: true,
       data: allBoard,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -154,23 +151,17 @@ exports.addMember = async (req, res) => {
   try {
     const board = await Board.findOne({ where: { id: boardId, orgId } });
     const user = await User.findOne({ where: { email, orgId } });
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
-    if (!user)
-      return res
-        .status(404)
-        .json({ message: "User not found", success: false });
+    if (!board) return res.json({ message: "Board not found", success: false });
+    if (!user) return res.json({ message: "User not found", success: false });
     const boardMemberData = await BoardMember.findOne({
       where: { userId: user.id, boardId },
     });
     if (boardMemberData)
-      return res.status(400).json({
+      return res.json({
         message: "User already added",
         success: false,
       });
-    await BoardMember.create({
+    const member = await BoardMember.create({
       id: uuidv4(),
       userId: user.id,
       boardId,
@@ -178,9 +169,15 @@ exports.addMember = async (req, res) => {
     res.status(200).json({
       message: "Member added successfully",
       success: true,
+      data: {
+        id: member.userId,
+        email,
+        orgId: user.orgId,
+        username: user.username,
+      },
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -193,20 +190,14 @@ exports.removeMember = async (req, res) => {
   const orgId = req.orgId;
   try {
     const board = await Board.findOne({ where: { id: boardId, orgId } });
-    if (!board)
-      return res
-        .status(404)
-        .json({ message: "Board not found", success: false });
+    if (!board) return res.json({ message: "Board not found", success: false });
     const user = await User.findOne({ where: { id: userId, orgId } });
-    if (!user)
-      return res
-        .status(404)
-        .json({ message: "User not found", success: false });
+    if (!user) return res.json({ message: "User not found", success: false });
     const boardMemberData = await BoardMember.findOne({
       where: { userId: user.id, boardId },
     });
     if (!boardMemberData)
-      return res.status(400).json({
+      return res.json({
         message: "User not a board member",
         success: false,
       });
@@ -220,7 +211,7 @@ exports.removeMember = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
@@ -228,7 +219,7 @@ exports.removeMember = async (req, res) => {
   }
 };
 
-exports.orgAllBoards = async (req, res) => {
+exports.getAllBoardsInOrg = async (req, res) => {
   const orgId = req.orgId;
   try {
     const allBoard = await Board.findAll(
@@ -237,16 +228,16 @@ exports.orgAllBoards = async (req, res) => {
     );
     if (!allBoard)
       return res
-        .status(404)
         .json({ message: "Boards not found", success: false });
 
     res.status(200).json({
       message: "Boards listed successfully",
       success: true,
       data: allBoard,
+      totalBoards: allBoard.length,
     });
   } catch (error) {
-    res.status(500).json({
+    res.json({
       message: "Something went wrong",
       success: false,
       error: error.message,
