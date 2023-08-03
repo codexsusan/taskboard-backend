@@ -6,6 +6,7 @@ const { onlyUserAccess } = require("../middlewares/onlyUserAccess");
 const { onlyOrgAccess } = require("../middlewares/onlyOrgAccess");
 const { boardMembership } = require("../middlewares/boardMembership");
 const { User } = require("../models");
+const upload = require("../middlewares/multer");
 
 // Add user to an organization
 router.post("/register", verifyUser, userController.userSignUp);
@@ -50,6 +51,13 @@ router.get(
   boardMembership,
   userController.getAllUsersInBoard
 );
+
+router.patch(
+  "/update/avatar",
+  verifyUser,
+  upload.single("avatar"),
+  userController.avatar
+)
 
 // Delete a user
 router.delete("/delete/:userId", verifyUser, userController.deleteUser);

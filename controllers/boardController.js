@@ -16,9 +16,7 @@ exports.createBoard = async (req, res) => {
 
     if (userType === "user") {
       const user = await User.findByPk(req.user.user.id);
-      if (!user)
-        return res
-          .json({ message: "User not found", success: false });
+      if (!user) return res.json({ message: "User not found", success: false });
 
       const boardMember = await BoardMember.findOne({
         where: { userId: user.id, boardId: board.id },
@@ -126,14 +124,15 @@ exports.getAllBoards = async (req, res) => {
     if (allBoard.length === 0) {
       return res.json({
         message: "No boards found",
-        success: false,
+        success: true,
+        boardCount: 0,
       });
     }
-
     res.json({
       message: "Boards listed successfully",
       success: true,
       data: allBoard,
+      boardCount: allBoard.length,
     });
   } catch (error) {
     res.json({
@@ -227,8 +226,7 @@ exports.getAllBoardsInOrg = async (req, res) => {
       { where: { orgId } }
     );
     if (!allBoard)
-      return res
-        .json({ message: "Boards not found", success: false });
+      return res.json({ message: "Boards not found", success: false });
 
     res.status(200).json({
       message: "Boards listed successfully",

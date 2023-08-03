@@ -1,5 +1,7 @@
 const { User, Board, BoardMember } = require("../models");
 const { v4: uuidv4 } = require("uuid");
+const cloudinary = require("../middlewares/cloudinary");
+const fs = require("fs");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
@@ -178,7 +180,6 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsersInBoard = async (req, res) => {
   const boardId = req.params.boardId;
-  const orgId = req.orgId;
   try {
     let board = await Board.findByPk(boardId);
     if (!board)
@@ -294,6 +295,30 @@ exports.deleteUser = async (req, res) => {
     await User.destroy({ where: { id: userId } });
 
     res.status(200).json({ message: "Successfully deleted.", success: true });
+  } catch (error) {
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.avatar = async (req, res) => {
+  const userId = req.user.user.id;
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      public_id: `${userId}-${req.file.fieldname}`,
+    });
+
+    const image = result.secure_url;
+    await User.update({ image }, { where: { id: userId } });
+
+    res.json({
+      message: "Successfully",
+      imageUrl: result.secure_url,
+      success: true,
+    });
   } catch (error) {
     res.json({
       message: "Something went wrong.",

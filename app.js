@@ -5,6 +5,7 @@ var cors = require("cors");
 require("dotenv").config();
 app.use(bodyParser.json());
 app.use(cors());
+app.use(express.urlencoded({ extended: false }));
 
 // Routers
 const orgRouter = require("./routes/orgRouter");

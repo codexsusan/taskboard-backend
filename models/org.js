@@ -19,7 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "orgId",
         onDelete: "CASCADE",
       });
-      
     }
     static createOrg = async (orgname, email, password) => {
       return this.create({
@@ -36,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       orgname: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      image: DataTypes.STRING,
     },
     {
       sequelize,

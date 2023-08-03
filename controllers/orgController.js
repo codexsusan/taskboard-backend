@@ -1,16 +1,20 @@
 const { Org, User, Board } = require("../models");
 const bcrypt = require("bcrypt");
+const cloudinary = require("../middlewares/cloudinary");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const fs = require("fs");
 
 exports.orgSignUp = async (req, res) => {
   const { orgname, email, password } = req.body;
   try {
     let org = await Org.findOne({ where: { email } });
     if (org)
-      return res
-        .json({ message: "Organization already exists", success: false });
+      return res.json({
+        message: "Organization already exists",
+        success: false,
+      });
 
     // Hashing the password
     const salt = await bcrypt.genSalt(saltRounds);
@@ -53,13 +57,11 @@ exports.orgLogin = async (req, res) => {
   try {
     let org = await Org.findOne({ where: { email } });
     if (!org)
-      return res
-        .json({ message: "Invalid credentials.", success: false });
+      return res.json({ message: "Invalid credentials.", success: false });
 
     const isMatch = await bcrypt.compare(password, org.password);
     if (!isMatch)
-      return res
-        .json({ message: "Invalid credentials.", success: false });
+      return res.json({ message: "Invalid credentials.", success: false });
 
     const data = {
       org: {
@@ -94,8 +96,10 @@ exports.orgDelete = async (req, res) => {
   try {
     const org = await Org.findByPk(orgId);
     if (!org)
-      return res
-        .json({ message: "Organization does not exist.", success: false });
+      return res.json({
+        message: "Organization does not exist.",
+        success: false,
+      });
     await Org.destroy({ where: { id: orgId } });
     res.status(200).json({ message: "Successfully deleted.", success: true });
   } catch (error) {
@@ -113,8 +117,10 @@ exports.orgUpdateBasic = async (req, res) => {
   try {
     const org = await Org.findByPk(orgId);
     if (!org)
-      return res
-        .json({ message: "Organization does not exist.", success: false });
+      return res.json({
+        message: "Organization does not exist.",
+        success: false,
+      });
     await Org.update({ orgname, email }, { where: { id: orgId } });
     res.status(200).json({ message: "Successfully updated.", success: true });
   } catch (error) {
@@ -133,14 +139,15 @@ exports.updateCredentials = async (req, res) => {
     const org = await Org.findByPk(orgId);
 
     if (!org)
-      return res
-        .json({ message: "Organization does not exist.", success: false });
+      return res.json({
+        message: "Organization does not exist.",
+        success: false,
+      });
 
     const isMatch = await bcrypt.compare(oldPassword, org.password);
 
     if (!isMatch)
-      return res
-        .json({ message: "Invalid credentials.", success: false });
+      return res.json({ message: "Invalid credentials.", success: false });
 
     const salt = await bcrypt.genSalt(saltRounds);
 
@@ -171,11 +178,39 @@ exports.getOrg = async (req, res) => {
     });
 
     if (!org)
-      return res
-        .json({ message: "Organization does not exist.", success: false });
+      return res.json({
+        message: "Organization does not exist.",
+        success: false,
+      });
     res
       .status(200)
       .json({ message: "Successfully fetched.", success: true, data: org });
+  } catch (error) {
+    res.json({
+      message: "Something went wrong.",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+exports.avatar = async (req, res) => {
+  const orgId = req.orgId;
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      public_id: `${orgId}-${req.file.fieldname}`,
+    });
+    fs.rm(`./uploads/${result.original_filename}.JPG`, (err) => {
+      if (err) console.log(err);
+    });
+    const image = result.secure_url;
+    await Org.update({ image }, { where: { id: orgId } });
+
+    res.json({
+      message: "Successfully",
+      imageUrl: result.secure_url,
+      success: true,
+    });
   } catch (error) {
     res.json({
       message: "Something went wrong.",

@@ -14,6 +14,7 @@ exports.createTask = async (req, res) => {
   const userType = req.user.userType;
   try {
     const stage = await Stage.findByPk(stageId);
+    console.log(stage);
     if (!stage)
       return res.json({
         message: "Stage not found.",
@@ -38,6 +39,7 @@ exports.createTask = async (req, res) => {
       message: "Task created successfully.",
       success: true,
       data: task,
+      stage,
     });
   } catch (error) {
     res.json({

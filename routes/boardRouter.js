@@ -32,7 +32,7 @@ router.delete(
 );
 
 // Get all board of an organization
-router.get("/org/all", verifyUser, onlyOrgAccess, boardController.getAllBoards);
+router.get("/org/all", verifyUser,  boardController.getAllBoards);
 
 // Add a member to a board
 router.post(
@@ -48,6 +48,5 @@ router.delete(
   onlyOrgAccess,
   boardController.removeMember
 );
-
 
 module.exports = router;
