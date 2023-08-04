@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       priority: DataTypes.STRING,
       commentsOrder: DataTypes.ARRAY(DataTypes.STRING),
       stageId: DataTypes.STRING,
+      boardId: DataTypes.STRING,
     },
     {
       sequelize,

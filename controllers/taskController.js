@@ -27,6 +27,7 @@ exports.createTask = async (req, res) => {
       priority,
       commentsOrder: [],
       stageId,
+      boardId: stage.boardId,
     });
 
     if (userType === "user") {
@@ -254,7 +255,7 @@ exports.unassignTask = async (req, res) => {
   }
 };
 
-exports.viewAllAssigned = async (req, res) => {
+exports.viewAllAssignedUsers = async (req, res) => {
   const { taskId, boardId } = req.params;
   try {
     const board = await Board.findByPk(boardId);
@@ -271,15 +272,17 @@ exports.viewAllAssigned = async (req, res) => {
       });
     const assignedUsers = await UserTask.findAll({
       where: { taskId },
-      attributes: { exclude: ["updatedAt"] },
+      attributes: { exclude: ["updatedAt", "createdAt", "id"] },
     });
     let users = [];
     for (let i = 0; i < assignedUsers.length; i++) {
       const assignedUser = assignedUsers[i];
-      const user = await User.findOne(
-        { attributes: { exclude: ["password", "createdAt", "updatedAt"] } },
-        { where: { id: assignedUser.userId } }
-      );
+      const user = await User.findOne({
+        where: { id: assignedUser.userId },
+        attributes: { exclude: ["updatedAt", "createdAt", "password", "orgId"] },
+      });
+      console.log(assignedUser.userId);
+      console.log(user.id);
       users = [...users, user];
     }
     res.status(200).json({
@@ -296,6 +299,31 @@ exports.viewAllAssigned = async (req, res) => {
     });
   }
 };
+
+// exports.allUnAssignedUsers = async (req, res) => {
+//   const { taskId, boardId } = req.params;
+//   try {
+//     const board = await Board.findByPk(boardId);
+//     if (!board)
+//       return res.json({
+//         message: "Board not found.",
+//         success: false,
+//       });
+//     const task = await Task.findByPk(taskId);
+//     if (!task)
+//       return res.json({
+//         message: "Task not found.",
+//         success: false,
+//       });
+
+//   } catch (error) {
+//     res.json({
+//       message: "Something went wrong.",
+//       success: false,
+//       error: error.message,
+//     });
+//   }
+// };
 
 exports.deleteTask = async (req, res) => {
   const { stageId, taskId } = req.params;

@@ -68,11 +68,24 @@ router.get(
   "/board/:boardId/:taskId/allAssigned",
   verifyUser,
   boardMembership,
-  taskController.viewAllAssigned
+  taskController.viewAllAssignedUsers
+);
+
+// Get all unassigned user of a task
+router.get(
+  "/board/:boardId/:taskId/allUnAssigned",
+  verifyUser,
+  boardMembership,
+  taskController.viewAllAssignedUsers
 );
 
 // Get all task of an organization
-router.get("/org/allTasks", verifyUser, taskController.viewAllTasksInOrg);
+router.get(
+  "/org/allTasks",
+  verifyUser,
+  boardMembership,
+  taskController.viewAllTasksInOrg
+);
 
 // Switch stage of a task
 router.get(
