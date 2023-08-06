@@ -23,6 +23,7 @@ router.patch(
   boardMembership,
   boardController.updateBoard
 );
+
 // Delete a board
 router.delete(
   "/:boardId",
@@ -32,7 +33,14 @@ router.delete(
 );
 
 // Get all board of an organization
-router.get("/org/all", verifyUser,  boardController.getAllBoards);
+router.get("/org/all", verifyUser, boardController.getAllBoards);
+
+// Get all board user is an member of
+router.get(
+  "/user/all",
+  verifyUser,
+  boardController.allUserMemberships
+);
 
 // Add a member to a board
 router.post(
@@ -42,6 +50,7 @@ router.post(
   boardController.addMember
 );
 
+// Remove member from a board
 router.delete(
   "/:boardId/remove-member/:userId",
   verifyUser,

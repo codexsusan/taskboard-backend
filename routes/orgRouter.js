@@ -20,6 +20,7 @@ router.patch(
   onlyOrgAccess,
   orgController.updateCredentials
 );
+
 router.get("/view/:orgId", verifyUser, orgController.getOrg);
 
 router.patch(

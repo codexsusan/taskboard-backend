@@ -15,20 +15,20 @@ router.post(
   taskController.createTask
 );
 
-// Delete a task
-router.delete(
-  "/board/:boardId/stage/:stageId/delete/:taskId",
-  verifyUser,
-  checkTaskAssigned,
-  taskController.deleteTask
-);
-
 // Update a task
 router.patch(
   "/board/:boardId/stage/:stageId/update/:taskId",
   verifyUser,
   checkTaskAssigned,
   taskController.updateTask
+);
+
+// Delete a task
+router.delete(
+  "/board/:boardId/stage/:stageId/delete/:taskId",
+  verifyUser,
+  checkTaskAssigned,
+  taskController.deleteTask
 );
 
 // Get a task
@@ -66,14 +66,6 @@ router.get(
 // Get all assigned user of a task
 router.get(
   "/board/:boardId/:taskId/allAssigned",
-  verifyUser,
-  boardMembership,
-  taskController.viewAllAssignedUsers
-);
-
-// Get all unassigned user of a task
-router.get(
-  "/board/:boardId/:taskId/allUnAssigned",
   verifyUser,
   boardMembership,
   taskController.viewAllAssignedUsers

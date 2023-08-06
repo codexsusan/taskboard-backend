@@ -5,6 +5,7 @@ const stageController = require("../controllers/stageController");
 const { verifyUser } = require("../middlewares/verifyUser");
 const { boardMembership } = require("../middlewares/boardMembership");
 
+// Create a stage
 router.post(
   "/board/:boardId/create",
   verifyUser,
@@ -12,6 +13,7 @@ router.post(
   stageController.createStage
 );
 
+// Delete a stage
 router.delete(
   "/board/:boardId/delete/:stageId",
   verifyUser,
@@ -19,6 +21,7 @@ router.delete(
   stageController.deleteStage
 );
 
+// Update a stage
 router.patch(
     "/board/:boardId/update/:stageId",
     verifyUser,
@@ -26,13 +29,15 @@ router.patch(
     stageController.updateStage
 )
 
+// Get single stage
 router.get(
-  "/board/:boardId/view/:stageId",
+  "/board/:boardId/stage/:stageId",
   verifyUser,
   boardMembership,
   stageController.viewStage
 )
 
+// Get all stages of a board 
 router.get(
   "/board/:boardId/stages/all",
   verifyUser,

@@ -218,6 +218,33 @@ exports.removeMember = async (req, res) => {
   }
 };
 
+exports.allUserMemberships = async (req, res) => {
+  const userId = req.user.user.id;
+  // console.log(userId);
+  try {
+    const allBoard = await BoardMember.findAll(
+      { attributes: { exclude: ["createdAt", "updatedAt"] } },
+      { where: { userId } }
+    );
+    if (!allBoard)
+      return res.json({ message: "Boards not found", success: false });
+    console.log(allBoard);
+
+    res.status(200).json({
+      message: "Boards listed successfully",
+      success: true,
+      data: allBoard,
+      totalBoards: allBoard.length,
+    });
+  } catch (error) {
+    res.json({
+      message: "Something went wrong",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
 exports.getAllBoardsInOrg = async (req, res) => {
   const orgId = req.orgId;
   try {

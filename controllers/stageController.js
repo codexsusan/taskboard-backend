@@ -55,7 +55,7 @@ exports.updateStage = async (req, res) => {
 
     await Stage.update({ title }, { where: { id: stageId, boardId } });
     res.status(200).json({
-      message: "Stage updated.",
+      message: "Stage title updated.",
       success: true,
       data: { id: stageId, title },
     });

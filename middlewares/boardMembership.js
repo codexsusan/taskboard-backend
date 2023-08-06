@@ -17,7 +17,7 @@ exports.boardMembership = async (req, res, next) => {
       req.board = board;
       return next();
     } else {
-      return res.json({ message: "Unauthorized", success: false });
+      return res.json({ message: "You are not a member of this board.", success: false });
     }
   } catch (error) {
     console.log(error);

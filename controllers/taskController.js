@@ -300,31 +300,6 @@ exports.viewAllAssignedUsers = async (req, res) => {
   }
 };
 
-// exports.allUnAssignedUsers = async (req, res) => {
-//   const { taskId, boardId } = req.params;
-//   try {
-//     const board = await Board.findByPk(boardId);
-//     if (!board)
-//       return res.json({
-//         message: "Board not found.",
-//         success: false,
-//       });
-//     const task = await Task.findByPk(taskId);
-//     if (!task)
-//       return res.json({
-//         message: "Task not found.",
-//         success: false,
-//       });
-
-//   } catch (error) {
-//     res.json({
-//       message: "Something went wrong.",
-//       success: false,
-//       error: error.message,
-//     });
-//   }
-// };
-
 exports.deleteTask = async (req, res) => {
   const { stageId, taskId } = req.params;
   try {

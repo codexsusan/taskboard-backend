@@ -14,7 +14,7 @@ router.post("/register", verifyUser, userController.userSignUp);
 // User login
 router.post("/login", userController.userLogIn);
 
-// Update user data
+// Update user basic info
 router.patch(
   "/update/basic",
   verifyUser,
@@ -52,6 +52,7 @@ router.get(
   userController.getAllUsersInBoard
 );
 
+// Update user avatar
 router.patch(
   "/update/avatar",
   verifyUser,
