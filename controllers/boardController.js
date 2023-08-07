@@ -113,11 +113,9 @@ exports.getBoard = async (req, res) => {
 
 exports.getAllBoards = async (req, res) => {
   const orgId = req.orgId;
+  console.log(orgId);
   try {
-    const allBoard = await Board.findAll(
-      { attributes: { exclude: ["createdAt", "updatedAt"] } },
-      { where: { orgId } }
-    );
+    const allBoard = await Board.findAll({ where: { orgId } });
     if (!allBoard)
       return res.json({ message: "Boards not found", success: false });
 
@@ -218,9 +216,8 @@ exports.removeMember = async (req, res) => {
   }
 };
 
-exports.allUserMemberships = async (req, res) => {
+exports.getAllBoardsByUser = async (req, res) => {
   const userId = req.user.user.id;
-  // console.log(userId);
   try {
     const allBoard = await BoardMember.findAll(
       { attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -228,12 +225,20 @@ exports.allUserMemberships = async (req, res) => {
     );
     if (!allBoard)
       return res.json({ message: "Boards not found", success: false });
-    console.log(allBoard);
+    const boardIds = allBoard.map((board) => board.boardId);
+    let boards = [];
+    for (let i = 0; i < boardIds.length; i++) {
+      const board = await Board.findOne(
+        { attributes: { exclude: ["stageOrder", "createdAt", "updatedAt"] } },
+        { where: { id: boardIds[i] } }
+      );
+      boards = [...boards, board];
+    }
 
     res.status(200).json({
       message: "Boards listed successfully",
       success: true,
-      data: allBoard,
+      data: boards,
       totalBoards: allBoard.length,
     });
   } catch (error) {

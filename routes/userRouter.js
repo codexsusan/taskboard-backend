@@ -61,6 +61,6 @@ router.patch(
 )
 
 // Delete a user
-router.delete("/delete/:userId", verifyUser, userController.deleteUser);
+router.delete("/delete/:userId", verifyUser, onlyOrgAccess, userController.deleteUser);
 
 module.exports = router;

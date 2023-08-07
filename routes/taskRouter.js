@@ -75,7 +75,6 @@ router.get(
 router.get(
   "/org/allTasks",
   verifyUser,
-  boardMembership,
   taskController.viewAllTasksInOrg
 );
 

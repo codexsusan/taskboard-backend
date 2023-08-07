@@ -58,24 +58,22 @@ exports.userSignUp = async (req, res) => {
       { attributes: { exclude: ["updatedAt"] } }
     );
     if (user)
-      return res.json({ message: "User already exists", success: false });
+      return res.json({
+        message: "User already exists! Please try with different email",
+        success: false,
+      });
 
     // Hashing the password
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    user = await User.create(
-      {
-        id: uuidv4(),
-        username,
-        email,
-        password: hashPassword,
-        orgId,
-      },
-      {
-        attributes: { exclude: ["updatedAt"] },
-      }
-    );
+    user = await User.create({
+      id: uuidv4(),
+      username,
+      email,
+      password: hashPassword,
+      orgId,
+    });
 
     res.status(201).json({
       message: "Successfully registered.",
@@ -285,6 +283,7 @@ exports.deleteUser = async (req, res) => {
       if (user.orgId !== orgId)
         return res.json({ message: "Unauthorized.", success: false });
     }
+    console.log(userType);
 
     if (userType === "user") {
       const requestorId = req.user.user.id;

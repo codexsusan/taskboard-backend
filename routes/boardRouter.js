@@ -39,7 +39,7 @@ router.get("/org/all", verifyUser, boardController.getAllBoards);
 router.get(
   "/user/all",
   verifyUser,
-  boardController.allUserMemberships
+  boardController.getAllBoardsByUser
 );
 
 // Add a member to a board

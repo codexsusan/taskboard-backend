@@ -187,7 +187,6 @@ exports.assignTask = async (req, res) => {
       });
 
     await UserTask.create({
-      // id: uuidv4(),
       userId,
       taskId,
     });
@@ -279,7 +278,9 @@ exports.viewAllAssignedUsers = async (req, res) => {
       const assignedUser = assignedUsers[i];
       const user = await User.findOne({
         where: { id: assignedUser.userId },
-        attributes: { exclude: ["updatedAt", "createdAt", "password", "orgId"] },
+        attributes: {
+          exclude: ["updatedAt", "createdAt", "password", "orgId"],
+        },
       });
       console.log(assignedUser.userId);
       console.log(user.id);
@@ -326,29 +327,30 @@ exports.deleteTask = async (req, res) => {
 exports.viewAllTasksInOrg = async (req, res) => {
   const orgId = req.orgId;
   try {
-    const boards = await Board.findAll({
-      where: { orgId },
+  const boards = await Board.findAll({
+    where: { orgId },
+  });
+  const boardIds = boards.map((board) => board.id);
+  const stages = await Stage.findAll({
+    where: { boardId: boardIds },
+  });
+  const stageIds = stages.map((stage) => stage.id);
+  let tasks = [];
+  for (let i = 0; i < stageIds.length; i++) {
+    const stageId = stageIds[i];
+    const stageTasks = await Task.findAll({
+      where: { stageId },
+      attributes: { exclude: ["updatedAt"] },
     });
-    const boardIds = boards.map((board) => board.id);
-    const stages = await Stage.findAll({
-      where: { boardId: boardIds },
-    });
-    const stageIds = stages.map((stage) => stage.id);
-    let tasks = [];
-    for (let i = 0; i < stageIds.length; i++) {
-      const stageId = stageIds[i];
-      const stageTasks = await Task.findAll({
-        where: { stageId },
-        attributes: { exclude: ["updatedAt"] },
-      });
-      tasks = [...tasks, ...stageTasks];
-    }
-    res.status(200).json({
-      message: "Tasks found.",
-      success: true,
-      data: tasks,
-      tasksCount: tasks.length,
-    });
+    tasks = [...tasks, ...stageTasks];
+  }
+  res.status(200).json({
+    message: "Tasks found.",
+    success: true,
+    data: tasks,
+    // data: orgId,
+    tasksCount: tasks.length,
+  });
   } catch (error) {
     res.json({
       message: "Something went wrong.",
