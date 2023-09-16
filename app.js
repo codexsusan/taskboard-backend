@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
 var cors = require("cors");
 require("dotenv").config();
 app.use(bodyParser.json());
 app.use(cors());
+app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 
 // Routers

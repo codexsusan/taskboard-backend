@@ -218,19 +218,19 @@ exports.removeMember = async (req, res) => {
 
 exports.getAllBoardsByUser = async (req, res) => {
   const userId = req.user.user.id;
+  const orgId = req.orgId;
   try {
-    const allBoard = await BoardMember.findAll(
-      { attributes: { exclude: ["createdAt", "updatedAt"] } },
-      { where: { userId } }
-    );
-    if (!allBoard)
+    const allAssociatedBoard = await BoardMember.findAll({
+      where: { userId },
+    });
+    if (!allAssociatedBoard)
       return res.json({ message: "Boards not found", success: false });
-    const boardIds = allBoard.map((board) => board.boardId);
+    const associatedBoardIds = allAssociatedBoard.map((board) => board.boardId);
     let boards = [];
-    for (let i = 0; i < boardIds.length; i++) {
+    for (let i = 0; i < associatedBoardIds.length; i++) {
       const board = await Board.findOne(
         { attributes: { exclude: ["stageOrder", "createdAt", "updatedAt"] } },
-        { where: { id: boardIds[i] } }
+        { where: { id: associatedBoardIds[i] } }
       );
       boards = [...boards, board];
     }
@@ -239,7 +239,7 @@ exports.getAllBoardsByUser = async (req, res) => {
       message: "Boards listed successfully",
       success: true,
       data: boards,
-      totalBoards: allBoard.length,
+      totalBoards: allAssociatedBoard.length,
     });
   } catch (error) {
     res.json({
