@@ -78,7 +78,16 @@ exports.userSignUp = async (req, res) => {
     res.status(201).json({
       message: "Successfully registered.",
       success: true,
-      data: user,
+      // TODO: Try to remove the below data
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        orgId: user.orgId,
+        updatedAt: user.updatedAt,
+        createdAt: user.createdAt,
+        image: user.image,
+      },
     });
   } catch (error) {
     res.json({
@@ -145,7 +154,7 @@ exports.getUser = async (req, res) => {
   try {
     let user = await User.findByPk(userId, {
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
+        exclude: ["password"],
       },
     });
 
@@ -217,7 +226,12 @@ exports.getAllUsersPaginated = async (req, res) => {
   try {
     let results = {};
     const allData = await User.findAll({
+      limit,
+      offset: startIndex,
       where: { orgId },
+      attributes: {
+        exclude: ["password"],
+      },
     });
     if (startIndex > 0) {
       results.previous = {
@@ -231,7 +245,7 @@ exports.getAllUsersPaginated = async (req, res) => {
         limit: limit,
       };
     }
-    results.results = allData.slice(startIndex, endIndex);
+    results.results = allData;
     res.status(200).json({
       message: "Successfully fetched.",
       success: true,
@@ -253,7 +267,7 @@ exports.getAllUsersInOrg = async (req, res) => {
     let users = await User.findAll({
       where: { orgId },
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
+        exclude: ["password"],
       },
     });
     res

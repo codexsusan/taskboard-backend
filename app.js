@@ -18,6 +18,9 @@ const taskRouter = require("./routes/taskRouter");
 const commentRouter = require("./routes/commentRouter");
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 app.use("/org", orgRouter);
 app.use("/user", userRouter);
 app.use("/board", boardRouter);

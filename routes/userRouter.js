@@ -14,6 +14,16 @@ router.post("/register", verifyUser, userController.userSignUp);
 // User login
 router.post("/login", userController.userLogIn);
 
+// Get user data
+router.get("/view/:userId", verifyUser, userController.getUser);
+
+// Get all users from the organization paginated data
+router.get("/org/all", verifyUser, userController.getAllUsersPaginated);
+
+// Get all users from the organization
+router.get("/org/allusers", verifyUser, userController.getAllUsersInOrg);
+
+// TODO: Not checked
 // Update user basic info
 router.patch(
   "/update/basic",
@@ -30,20 +40,6 @@ router.patch(
   userController.updateCredentials
 );
 
-// Get user data
-router.get("/view/:userId", verifyUser, userController.getUser);
-
-// Get all users from the organization paginated data
-router.get("/org/all", verifyUser, userController.getAllUsersPaginated);
-
-// Get all users from the organization
-router.get(
-  "/org/allusers",
-  verifyUser,
-  // onlyOrgAccess,
-  userController.getAllUsersInOrg
-);
-
 // Get all board members
 router.get(
   "/all/board/:boardId",
@@ -58,9 +54,14 @@ router.patch(
   verifyUser,
   upload.single("avatar"),
   userController.avatar
-)
+);
 
 // Delete a user
-router.delete("/delete/:userId", verifyUser, onlyOrgAccess, userController.deleteUser);
+router.delete(
+  "/delete/:userId",
+  verifyUser,
+  onlyOrgAccess,
+  userController.deleteUser
+);
 
 module.exports = router;

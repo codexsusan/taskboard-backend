@@ -223,18 +223,17 @@ exports.getAllBoardsByUser = async (req, res) => {
     const allAssociatedBoard = await BoardMember.findAll({
       where: { userId },
     });
-    if (!allAssociatedBoard)
+    if (!allAssociatedBoard) {
       return res.json({ message: "Boards not found", success: false });
-    const associatedBoardIds = allAssociatedBoard.map((board) => board.boardId);
-    let boards = [];
-    for (let i = 0; i < associatedBoardIds.length; i++) {
-      const board = await Board.findOne(
-        { attributes: { exclude: ["stageOrder", "createdAt", "updatedAt"] } },
-        { where: { id: associatedBoardIds[i] } }
-      );
-      boards = [...boards, board];
     }
-
+    const associatedBoardIds = allAssociatedBoard.map((board) => board.boardId);
+    const boards = await Board.findAll({
+      where: { id: associatedBoardIds },
+      attributes: { exclude: ["stageOrder", "createdAt", "updatedAt"] },
+    });
+    if (!boards) {
+      return res.json({ message: "Boards not found", success: false });
+    }
     res.status(200).json({
       message: "Boards listed successfully",
       success: true,

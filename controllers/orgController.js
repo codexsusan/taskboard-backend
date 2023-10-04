@@ -76,6 +76,7 @@ exports.orgLogin = async (req, res) => {
       message: "Successfully logged in.",
       success: true,
       authToken,
+      // TODO: Try to remove the below data
       data: {
         id: org.id,
         orgname: org.orgname,
@@ -173,7 +174,7 @@ exports.getOrg = async (req, res) => {
   try {
     const org = await Org.findByPk(orgId, {
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
+        exclude: ["password"],
       },
     });
 
