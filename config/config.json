@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "postgres",
-    "password": "postgres",
-    "database": "taskboard_dev",
+    "username": "susan",
+    "password": "92000@Ss",
+    "database": "taskboard_prod",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
