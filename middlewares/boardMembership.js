@@ -20,7 +20,7 @@ exports.boardMembership = async (req, res, next) => {
       return res.json({ message: "You are not a member of this board.", success: false });
     }
   } catch (error) {
-    console.log(error);
+    
     res.json({
       message: "Something went wrong",
       success: false,

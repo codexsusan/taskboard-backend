@@ -64,7 +64,7 @@ exports.updateBoard = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    
     res.json({
       message: "Something went wrong",
       success: false,
@@ -84,7 +84,7 @@ exports.deleteBoard = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    
     res.json({
       message: "Something went wrong",
       success: false,
@@ -207,7 +207,7 @@ exports.removeMember = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    
     res.json({
       message: "Something went wrong",
       success: false,
