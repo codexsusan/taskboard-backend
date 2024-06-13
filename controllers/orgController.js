@@ -8,8 +8,10 @@ const fs = require("fs");
 
 exports.orgSignUp = async (req, res) => {
   const { orgname, email, password } = req.body;
+
   try {
     let org = await Org.findOne({ where: { email } });
+    console.log(org);
     if (org)
       return res.json({
         message: "Organization already exists",
